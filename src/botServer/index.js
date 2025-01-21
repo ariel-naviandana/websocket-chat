@@ -15,6 +15,17 @@ app.use(bodyParser.json());
 
 botHandler(io, botService);
 
+app.post('/bot', async (req, res) => {
+    const { text } = req.body;
+    try {
+        const response = await botService.processMessage({ text });
+        res.json(response);
+    } catch (error) {
+        console.error('Error processing bot response:', error);
+        res.status(500).json({ error: 'Failed to process bot response' });
+    }
+});
+
 sequelize.sync().then(() => {
     server.listen(8001, () => {
         logger.info('Bot server is running on port 8001');

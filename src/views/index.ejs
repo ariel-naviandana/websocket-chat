@@ -56,28 +56,29 @@
         const messages = document.getElementById("messages");
         const messageInput = document.getElementById("message");
         const typingIndicator = document.getElementById("typing");
-
+    
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             chatContainer.style.display = "block";
             joinContainer.style.display = "none";
-
+    
             const response = await fetch('/messages');
             const messageHistory = await response.json();
             messageHistory.forEach(msg => {
                 addMessageToChat(`${msg.text} *(${msg.senderId})`, msg.senderId === socket.id ? 'right' : 'left');
             });
         });
-
+    
         messageInput.addEventListener("input", () => {
             socket.emit("typing", {});
         });
-
+    
         document.getElementById("chatForm").addEventListener("submit", (e) => {
             e.preventDefault();
             if (messageInput.value) {
                 const data = {
                     id: socket.id,
+                    senderId: socket.id,
                     text: messageInput.value
                 };
                 socket.emit("message", data);
@@ -85,20 +86,20 @@
                 messageInput.value = "";
             }
         });
-
+    
         socket.on("typing", () => {
             typingIndicator.style.display = "block";
             setTimeout(() => {
                 typingIndicator.style.display = "none";
             }, 3000);
         });
-
+    
         socket.on("message", (data) => {
             if (data.id !== socket.id) {
-                addMessageToChat(`${data.text} *(${data.id})`, "left");
+                addMessageToChat(`${data.text} *(${data.senderId})`, "left");
             }
         });
-
+    
         function addMessageToChat(message, align) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', align);

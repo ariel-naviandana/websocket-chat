@@ -2,9 +2,13 @@ const { Message } = require('../../../models');
 
 const saveMessage = async (data) => {
     try {
+        if (!data.senderId) {
+            throw new Error('senderId is required');
+        }
+
         await Message.create({
             text: data.text,
-            senderId: data.id,
+            senderId: data.senderId,
         });
     } catch (error) {
         console.error('Error saving message:', error);
