@@ -1,22 +1,29 @@
-'use strict';
-const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Message extends Model {
-    static associate(models) {
-    }
-  }
-  Message.init({
-    userId: {
+  const Message = sequelize.define('Message', {
+    id: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      autoIncrement: true,
+      primaryKey: true,
     },
     text: {
       type: DataTypes.STRING,
-      allowNull: false
-    }
-  }, {
-    sequelize,
-    modelName: 'Message',
+      allowNull: false,
+    },
+    senderId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   });
+
   return Message;
 };

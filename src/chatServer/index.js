@@ -16,24 +16,10 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
+chatHandler(io, chatService);
+
 app.get('/', (req, res) => {
     res.render('index', { title: 'Chat Room' });
-});
-
-io.on('connection', (socket) => {
-    console.log('a user connected');
-
-    socket.on('message', (data) => {
-        io.emit('message', data);
-    });
-
-    socket.on('typing', () => {
-        socket.broadcast.emit('typing');
-    });
-
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
 });
 
 sequelize.sync().then(() => {
