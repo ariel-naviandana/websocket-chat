@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      senderId: { // pastikan kolom ini sesuai dengan model
+      senderId: {
         type: Sequelize.STRING,
         allowNull: false
       },

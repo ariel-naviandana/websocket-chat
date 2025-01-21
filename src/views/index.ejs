@@ -57,10 +57,16 @@
         const messageInput = document.getElementById("message");
         const typingIndicator = document.getElementById("typing");
 
-        document.getElementById("loginForm").addEventListener("submit", (e) => {
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             chatContainer.style.display = "block";
             joinContainer.style.display = "none";
+
+            const response = await fetch('/messages');
+            const messageHistory = await response.json();
+            messageHistory.forEach(msg => {
+                addMessageToChat(`${msg.text} *(${msg.senderId})`, msg.senderId === socket.id ? 'right' : 'left');
+            });
         });
 
         messageInput.addEventListener("input", () => {

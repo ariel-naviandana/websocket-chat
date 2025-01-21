@@ -4,9 +4,7 @@ const chatHandler = (io, chatService) => {
 
         socket.on('message', async (data) => {
             try {
-                // Save the message to the database
                 await chatService.saveMessage(data);
-                // Broadcast the message to all clients
                 io.emit('message', data);
             } catch (error) {
                 console.error('Error saving message:', error);

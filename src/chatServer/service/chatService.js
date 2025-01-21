@@ -12,6 +12,18 @@ const saveMessage = async (data) => {
     }
 };
 
+const getMessages = async () => {
+    try {
+        return await Message.findAll({
+            order: [['createdAt', 'ASC']]
+        });
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        throw error;
+    }
+};
+
 module.exports = {
     saveMessage,
+    getMessages,
 };
