@@ -9,6 +9,7 @@ const saveMessage = async (data) => {
         await Message.create({
             text: data.text,
             senderId: data.senderId,
+            imageUrl: data.imageUrl
         });
     } catch (error) {
         console.error('Error saving message:', error);

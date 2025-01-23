@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const bodyParser = require('body-parser');
 const logger = require('../../helpers/logger');
-const chatHandler = require('./handler/chatHandler');
+const { chatHandler, sendMessage } = require('./handler/chatHandler'); // Pastikan impor ini benar
 const chatService = require('./service/chatService');
 const { sequelize } = require('../../models');
 const path = require('path');
@@ -13,10 +13,12 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
 chatHandler(io, chatService);
+sendMessage(app, chatService);
 
 app.get('/', (req, res) => {
     res.render('index', { title: 'Chat Room' });
