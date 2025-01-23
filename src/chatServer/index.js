@@ -3,11 +3,10 @@ const http = require('http');
 const socketIo = require('socket.io');
 const bodyParser = require('body-parser');
 const logger = require('../../helpers/logger');
-const { chatHandler, sendMessage } = require('./handler/chatHandler'); // Pastikan impor ini benar
+const { chatHandler, sendMessage } = require('./handler/chatHandler');
 const chatService = require('./service/chatService');
 const { sequelize } = require('../../models');
 const path = require('path');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);

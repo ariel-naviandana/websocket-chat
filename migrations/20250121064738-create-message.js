@@ -14,11 +14,11 @@ module.exports = {
       },
       text: {
         type: Sequelize.STRING,
-        allowNull: true // Change to true to allow null for image-only messages
+        allowNull: true
       },
       imageUrl: {
         type: Sequelize.STRING,
-        allowNull: true // Allow null as it is optional
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

@@ -30,7 +30,6 @@ const chatHandler = (io, chatService) => {
                 data.senderId = data.senderId || socket.id;
                 data.createdAt = new Date().toISOString();
 
-                await chatService.saveMessage(data);
                 io.emit('message', data);
 
                 if (data.text) {
@@ -39,7 +38,6 @@ const chatHandler = (io, chatService) => {
 
                     if (botMessage) {
                         const botData = { text: botMessage, senderId: 'bot', createdAt: new Date().toISOString() };
-                        await chatService.saveMessage(botData);
                         io.emit('message', botData);
                     }
                 }
@@ -66,14 +64,14 @@ const sendMessage = (app, chatService) => {
     app.post('/sendMessage', upload.single('image'), async (req, res) => {
         try {
             const { senderId, text } = req.body;
-            console.log('Received request:', req.body, req.file);
             let imageUrl = null;
 
             if (req.file) {
                 imageUrl = `/uploads/${req.file.filename}`;
             }
 
-            const messageData = { senderId, text, imageUrl, createdAt: new Date().toISOString() }; // Set createdAt to current time in ISO format
+            const messageData = { senderId, text, imageUrl, createdAt: new Date().toISOString() };
+            console.log('Saving message to database:', messageData);
             await chatService.saveMessage(messageData);
             res.json(messageData);
         } catch (error) {

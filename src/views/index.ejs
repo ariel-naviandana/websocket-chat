@@ -56,7 +56,7 @@
             color: white;
             padding: 5px 10px;
             border-radius: 20px;
-            display: none; /* Default hidden */
+            display: none;
         }
     </style>
 </head>
@@ -69,7 +69,6 @@
             <input type="submit" class="btn btn-success w-100" id="loginButton" value="Join Chat"/>
         </form>
     </div>
-
     <div id="chatContainer" style="display: none;">
         <div class="date-float" id="dateFloat"></div>
         <div id="messages" class="border p-4 mb-3" style="height: 300px; overflow-y: scroll;"></div>
@@ -81,9 +80,7 @@
         </form>
     </div>
 </div>
-
 <script src="/socket.io/socket.io.js"></script>
-
 <script>
     const socket = io();
     const joinContainer = document.getElementById("joinContainer");
@@ -94,6 +91,8 @@
     const typingIndicator = document.getElementById("typing");
     const dateFloat = document.getElementById("dateFloat");
     let userId = null;
+    let isTyping = false;
+    let typingTimeout;
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -110,7 +109,20 @@
     });
 
     messageInput.addEventListener("input", () => {
-        socket.emit("typing", { senderId: userId });
+        if (messageInput.value.trim() === "") {
+            socket.emit("stopTyping", { senderId: userId });
+            isTyping = false;
+        } else {
+            if (!isTyping) {
+                socket.emit("typing", { senderId: userId });
+                isTyping = true;
+            }
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit("stopTyping", { senderId: userId });
+                isTyping = false;
+            }, 3000);
+        }
     });
 
     document.getElementById("chatForm").addEventListener("submit", (e) => {
@@ -136,6 +148,7 @@
                 messageInput.value = "";
                 imageInput.value = "";
                 messageInput.focus();
+                isTyping = false;
             }).catch(error => {
                 console.error('Error sending message:', error);
             });
