@@ -27,5 +27,5 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-  });
-};
+  })
+}

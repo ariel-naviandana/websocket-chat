@@ -82,143 +82,143 @@
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const socket = io();
-    const joinContainer = document.getElementById("joinContainer");
-    const chatContainer = document.getElementById("chatContainer");
-    const messages = document.getElementById("messages");
-    const messageInput = document.getElementById("message");
-    const imageInput = document.getElementById("image");
-    const typingIndicator = document.getElementById("typing");
-    const dateFloat = document.getElementById("dateFloat");
-    let userId = null;
-    let isTyping = false;
-    let typingTimeout;
+    const socket = io()
+    const joinContainer = document.getElementById("joinContainer")
+    const chatContainer = document.getElementById("chatContainer")
+    const messages = document.getElementById("messages")
+    const messageInput = document.getElementById("message")
+    const imageInput = document.getElementById("image")
+    const typingIndicator = document.getElementById("typing")
+    const dateFloat = document.getElementById("dateFloat")
+    let userId = null
+    let isTyping = false
+    let typingTimeout
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        userId = document.getElementById("userId").value;
-        chatContainer.style.display = "block";
-        joinContainer.style.display = "none";
-        messageInput.focus();
+        e.preventDefault()
+        userId = document.getElementById("userId").value
+        chatContainer.style.display = "block"
+        joinContainer.style.display = "none"
+        messageInput.focus()
 
-        const response = await fetch('/messages');
-        const messageHistory = await response.json();
+        const response = await fetch('/messages')
+        const messageHistory = await response.json()
         messageHistory.forEach(msg => {
-            addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left');
-        });
-    });
+            addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
+        })
+    })
 
     messageInput.addEventListener("input", () => {
         if (messageInput.value.trim() === "") {
-            socket.emit("stopTyping", { senderId: userId });
-            isTyping = false;
+            socket.emit("stopTyping", { senderId: userId })
+            isTyping = false
         } else {
             if (!isTyping) {
-                socket.emit("typing", { senderId: userId });
-                isTyping = true;
+                socket.emit("typing", { senderId: userId })
+                isTyping = true
             }
-            clearTimeout(typingTimeout);
+            clearTimeout(typingTimeout)
             typingTimeout = setTimeout(() => {
-                socket.emit("stopTyping", { senderId: userId });
-                isTyping = false;
-            }, 3000);
+                socket.emit("stopTyping", { senderId: userId })
+                isTyping = false
+            }, 3000)
         }
-    });
+    })
 
     document.getElementById("chatForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const messageText = messageInput.value;
-        const imageFile = imageInput.files[0];
+        e.preventDefault()
+        const messageText = messageInput.value
+        const imageFile = imageInput.files[0]
 
         if (messageText || imageFile) {
-            const data = new FormData();
-            data.append('senderId', userId);
-            data.append('text', messageText);
+            const data = new FormData()
+            data.append('senderId', userId)
+            data.append('text', messageText)
             if (imageFile) {
-                data.append('image', imageFile);
+                data.append('image', imageFile)
             }
 
             fetch('/sendMessage', {
                 method: 'POST',
                 body: data
             }).then(response => response.json()).then(data => {
-                socket.emit("message", data);
-                addMessageToChat(data, "right");
-                socket.emit("stopTyping", { senderId: userId });
-                messageInput.value = "";
-                imageInput.value = "";
-                messageInput.focus();
-                isTyping = false;
+                socket.emit("message", data)
+                addMessageToChat(data, "right")
+                socket.emit("stopTyping", { senderId: userId })
+                messageInput.value = ""
+                imageInput.value = ""
+                messageInput.focus()
+                isTyping = false
             }).catch(error => {
-                console.error('Error sending message:', error);
-            });
+                console.error('Error sending message:', error)
+            })
         }
-    });
+    })
 
     socket.on("typing", (data) => {
-        typingIndicator.textContent = `${data.senderId} is typing...`;
-        typingIndicator.style.display = "block";
-    });
+        typingIndicator.textContent = `${data.senderId} is typing...`
+        typingIndicator.style.display = "block"
+    })
 
     socket.on("stopTyping", () => {
-        typingIndicator.textContent = "";
-        typingIndicator.style.display = "none";
-    });
+        typingIndicator.textContent = ""
+        typingIndicator.style.display = "none"
+    })
 
     socket.on("message", (data) => {
         if (data.senderId !== userId) {
-            addMessageToChat(data, "left");
+            addMessageToChat(data, "left")
         }
-    });
+    })
 
     function addMessageToChat(message, align) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', align);
+        const messageElement = document.createElement('div')
+        messageElement.classList.add('message', align)
 
-        const senderIdElement = document.createElement('div');
-        senderIdElement.classList.add('sender-id');
-        senderIdElement.textContent = message.senderId;
-        messageElement.appendChild(senderIdElement);
+        const senderIdElement = document.createElement('div')
+        senderIdElement.classList.add('sender-id')
+        senderIdElement.textContent = message.senderId
+        messageElement.appendChild(senderIdElement)
 
         if (message.imageUrl) {
-            const imageElement = document.createElement('img');
-            imageElement.src = message.imageUrl;
-            messageElement.appendChild(imageElement);
+            const imageElement = document.createElement('img')
+            imageElement.src = message.imageUrl
+            messageElement.appendChild(imageElement)
         }
 
         if (message.text) {
-            const textElement = document.createElement('div');
-            textElement.classList.add('message-text');
-            textElement.textContent = message.text;
-            messageElement.appendChild(textElement);
+            const textElement = document.createElement('div')
+            textElement.classList.add('message-text')
+            textElement.textContent = message.text
+            messageElement.appendChild(textElement)
         }
 
-        const timeElement = document.createElement('div');
-        timeElement.classList.add('message-time');
-        const timestamp = new Date(message.createdAt);
-        timeElement.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        messageElement.appendChild(timeElement);
+        const timeElement = document.createElement('div')
+        timeElement.classList.add('message-time')
+        const timestamp = new Date(message.createdAt)
+        timeElement.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        messageElement.appendChild(timeElement)
 
-        messages.appendChild(messageElement);
-        messages.scrollTop = messages.scrollHeight;
+        messages.appendChild(messageElement)
+        messages.scrollTop = messages.scrollHeight
     }
 
     messages.addEventListener('scroll', () => {
-        const messagesArray = Array.from(messages.children);
+        const messagesArray = Array.from(messages.children)
         for (let i = 0; i < messagesArray.length; i++) {
-            const messageElement = messagesArray[i];
-            const rect = messageElement.getBoundingClientRect();
+            const messageElement = messagesArray[i]
+            const rect = messageElement.getBoundingClientRect()
             if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-                const messageTime = messageElement.querySelector('.message-time');
-                const date = new Date(messageTime.textContent);
+                const messageTime = messageElement.querySelector('.message-time')
+                const date = new Date(messageTime.textContent)
                 if (!isNaN(date)) {
-                    dateFloat.textContent = date.toLocaleDateString();
-                    dateFloat.style.display = 'block';
+                    dateFloat.textContent = date.toLocaleDateString()
+                    dateFloat.style.display = 'block'
                 }
-                break;
+                break
             }
         }
-    });
+    })
 </script>
 </body>
 </html>
