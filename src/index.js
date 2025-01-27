@@ -6,8 +6,9 @@ const multer = require('multer')
 const logger = require('../helpers/logger')
 const { chatHandler, sendMessage } = require('./handlers/chatHandler')
 const botHandler = require('./handlers/botHandler')
-const chatService = require('./services/chatService')
-const botService = require('./services/botService')
+const ChatService = require('./services/chatService')
+const BotService = require('./services/botService')
+const MessageRepository = require('./repos/messageRepository')
 const { sequelize } = require('../models')
 const path = require('path')
 
@@ -30,6 +31,11 @@ const storage = multer.diskStorage({
     }
 })
 const upload = multer({ storage: storage })
+
+const messageRepository = new MessageRepository()
+
+const chatService = new ChatService(messageRepository)
+const botService = new BotService(messageRepository)
 
 chatHandler(io, chatService)
 botHandler(io, botService)

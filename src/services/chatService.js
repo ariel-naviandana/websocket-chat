@@ -1,17 +1,18 @@
-const messageRepository = require('../repos/messageRepository')
-
-const saveMessage = async (data) => {
-    if (!data.senderId) {
-        throw new Error('senderId is required')
+class ChatService {
+    constructor(messageRepository) {
+        this.messageRepository = messageRepository
     }
-    return messageRepository.saveMessage(data)
+
+    async saveMessage(data) {
+        if (!data.senderId) {
+            throw new Error('senderId is required')
+        }
+        return this.messageRepository.saveMessage(data)
+    }
+
+    async getMessages() {
+        return this.messageRepository.getMessages()
+    }
 }
 
-const getMessages = async () => {
-    return messageRepository.getMessages()
-}
-
-module.exports = {
-    saveMessage,
-    getMessages
-}
+module.exports = ChatService
