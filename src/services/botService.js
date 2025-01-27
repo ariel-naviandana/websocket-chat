@@ -12,10 +12,6 @@ const processMessage = async (message) => {
         }
     }
 
-    if (response) {
-        await messageRepository.saveMessage({ text: response, senderId: 'bot', createdAt: new Date().toISOString() })
-    }
-
     return response
 }
 

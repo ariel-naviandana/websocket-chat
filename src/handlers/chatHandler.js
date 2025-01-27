@@ -31,7 +31,6 @@ const chatHandler = (io, chatService) => {
                 data.createdAt = new Date().toISOString()
 
                 io.emit('message', data)
-                await chatService.saveMessage(data)
 
                 if (data.text) {
                     const response = await axios.post('http://localhost:8000/bot', { text: data.text })
