@@ -1,5 +1,8 @@
-class BotService {
+const IBotService = require('./IBotService')
+
+class BotService extends IBotService {
     constructor(messageRepository) {
+        super()
         this.messageRepository = messageRepository
     }
 

@@ -1,5 +1,8 @@
-class ChatService {
+const IChatService = require('./IChatService')
+
+class ChatService extends IChatService {
     constructor(messageRepository) {
+        super()
         this.messageRepository = messageRepository
     }
 
