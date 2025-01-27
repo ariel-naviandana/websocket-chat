@@ -1,7 +1,6 @@
 const IChatService = require('./IChatService')
-
 class ChatService extends IChatService {
-    constructor(messageRepository) {
+    constructor({ messageRepository }) {
         super()
         this.messageRepository = messageRepository
     }

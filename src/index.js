@@ -6,11 +6,10 @@ const multer = require('multer')
 const logger = require('../helpers/logger')
 const { chatHandler, sendMessage } = require('./handlers/chatHandler')
 const botHandler = require('./handlers/botHandler')
-const ChatService = require('./services/chatService')
-const BotService = require('./services/botService')
-const MessageRepository = require('./repos/messageRepository')
 const { sequelize } = require('../models')
 const path = require('path')
+const { scopePerRequest } = require('awilix-express')
+const container = require('./container')
 
 const app = express()
 const server = http.createServer(app)
@@ -32,13 +31,10 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-const messageRepository = new MessageRepository()
+app.use(scopePerRequest(container))
 
-const chatService = new ChatService(messageRepository)
-const botService = new BotService(messageRepository)
-
-chatHandler(io, chatService)
-botHandler(io, botService)
+chatHandler(io, container.resolve('chatService'))
+botHandler(io, container.resolve('botService'))
 
 app.get('/', (req, res) => {
     res.render('index', { title: 'Chat Room' })
@@ -46,6 +42,7 @@ app.get('/', (req, res) => {
 
 app.get('/messages', async (req, res) => {
     try {
+        const chatService = req.container.resolve('chatService')
         const messages = await chatService.getMessages()
         res.json(messages)
     } catch (error) {
@@ -63,6 +60,7 @@ app.post('/sendMessage', upload.single('image'), async (req, res) => {
             imageUrl = `/uploads/${req.file.filename}`
         }
 
+        const chatService = req.container.resolve('chatService')
         const messageData = { senderId, text, imageUrl, createdAt: new Date().toISOString() }
         console.log('Saving message to database:', messageData)
         await chatService.saveMessage(messageData)
@@ -76,6 +74,7 @@ app.post('/sendMessage', upload.single('image'), async (req, res) => {
 app.post('/bot', async (req, res) => {
     const { text } = req.body
     try {
+        const botService = req.container.resolve('botService')
         const response = await botService.processMessage({ text })
         res.json(response)
     } catch (error) {
