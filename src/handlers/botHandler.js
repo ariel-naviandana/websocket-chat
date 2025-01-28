@@ -7,8 +7,6 @@ class BotHandler {
 
     initializeSocketEvents() {
         this.io.on('connection', (socket) => {
-            console.log('a user connected')
-
             socket.on('message', async (data) => {
                 try {
                     const response = await this.botService.processMessage(data)
@@ -19,7 +17,6 @@ class BotHandler {
             })
 
             socket.on('disconnect', () => {
-                console.log('user disconnected')
             })
         })
     }

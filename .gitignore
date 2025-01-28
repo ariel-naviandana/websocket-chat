@@ -59,4 +59,4 @@ build/
 # Ignore yarn lock file
 yarn.lock
 
-config/
+config/config.json
