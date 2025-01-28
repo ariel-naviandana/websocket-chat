@@ -4,8 +4,8 @@ const socketIo = require('socket.io')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const logger = require('../helpers/logger')
-const { chatHandler, sendMessage } = require('./handlers/chatHandler')
-const botHandler = require('./handlers/botHandler')
+const ChatHandler = require('./handlers/ChatHandler')
+const BotHandler = require('./handlers/BotHandler')
 const { sequelize } = require('../models')
 const path = require('path')
 const { scopePerRequest } = require('awilix-express')
@@ -33,8 +33,12 @@ const upload = multer({ storage: storage })
 
 app.use(scopePerRequest(container))
 
-chatHandler(io, container.resolve('chatService'))
-botHandler(io, container.resolve('botService'))
+const chatService = container.resolve('chatService')
+const chatHandler = new ChatHandler(io, chatService)
+chatHandler.setupRoutes(app)
+
+const botService = container.resolve('botService')
+const botHandler = new BotHandler(io, botService)
 
 app.get('/', (req, res) => {
     res.render('index', { title: 'Chat Room' })
@@ -42,7 +46,6 @@ app.get('/', (req, res) => {
 
 app.get('/messages', async (req, res) => {
     try {
-        const chatService = req.container.resolve('chatService')
         const messages = await chatService.getMessages()
         res.json(messages)
     } catch (error) {
@@ -60,7 +63,6 @@ app.post('/sendMessage', upload.single('image'), async (req, res) => {
             imageUrl = `/uploads/${req.file.filename}`
         }
 
-        const chatService = req.container.resolve('chatService')
         const messageData = { senderId, text, imageUrl, createdAt: new Date().toISOString() }
         console.log('Saving message to database:', messageData)
         await chatService.saveMessage(messageData)
@@ -74,7 +76,6 @@ app.post('/sendMessage', upload.single('image'), async (req, res) => {
 app.post('/bot', async (req, res) => {
     const { text } = req.body
     try {
-        const botService = req.container.resolve('botService')
         const response = await botService.processMessage({ text })
         res.json(response)
     } catch (error) {
