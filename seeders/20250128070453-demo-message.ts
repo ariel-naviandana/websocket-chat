@@ -1,7 +1,7 @@
-'use strict'
+import { QueryInterface } from 'sequelize';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface: QueryInterface) => {
     return queryInterface.bulkInsert('messages', [
       {
         senderId: 'user1',
@@ -31,10 +31,11 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-    ])
+    ]);
   },
 
-  down: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('messages', null, {})
+  down: async (queryInterface: QueryInterface) => {
+    // Gunakan kondisi yang benar untuk menghapus semua entri
+    return queryInterface.bulkDelete('messages', {}, {});
   }
-}
+};
