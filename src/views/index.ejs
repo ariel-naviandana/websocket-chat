@@ -104,6 +104,7 @@
         </form>
     </div>
     <div id="chatContainer" style="display: none;">
+        <button class="btn btn-primary mb-3" id="homeButton">Home</button> <!-- Tambahkan tombol Home -->
         <div class="conversation-list" id="conversationList"></div>
         <div class="date-float" id="dateFloat"></div>
         <div id="messages" class="border p-4 mb-3" style="height: 300px; overflow-y: scroll;"></div>
@@ -128,6 +129,7 @@
     const typingIndicator = document.getElementById("typing")
     const dateFloat = document.getElementById("dateFloat")
     const conversationList = document.getElementById("conversationList")
+    const homeButton = document.getElementById("homeButton")
     let userId = null
     let isTyping = false
     let typingTimeout
@@ -145,11 +147,9 @@
         const messageHistory = await response.json()
         messageHistory.forEach(msg => {
             if (msg.senderId === userId || msg.receiverId === userId) {
-                addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
                 addConversation(msg.senderId === userId ? msg.receiverId : msg.senderId)
             }
         })
-        handleScroll()
     })
 
     messageInput.addEventListener("input", () => {
@@ -188,8 +188,8 @@
                 method: 'POST',
                 body: data
             }).then(response => response.json()).then(data => {
-                socket.emit("message", data)
                 addMessageToChat(data, "right")
+                socket.emit("message", data)
                 socket.emit("stopTyping", { senderId: userId })
                 messageInput.value = ""
                 imageInput.value = ""
@@ -216,8 +216,8 @@
     })
 
     socket.on("message", (data) => {
-        if (data.senderId === activeConversation || data.receiverId === activeConversation) {
-            addMessageToChat(data, data.senderId === userId ? 'right' : 'left')
+        if (data.senderId !== userId && (data.senderId === activeConversation || data.receiverId === activeConversation)) {
+            addMessageToChat(data, "left")
         }
         handleScroll()
     })
@@ -290,6 +290,7 @@
         activeConversation = conversationId
         document.getElementById(`conversation-${conversationId}`).classList.add('active-conversation')
         receiverInput.value = conversationId
+        receiverInput.disabled = true
         loadConversation(conversationId)
     }
 
@@ -326,6 +327,13 @@
     }
 
     messages.addEventListener('scroll', handleScroll)
+
+    homeButton.addEventListener("click", () => {
+        activeConversation = null
+        receiverInput.value = ""
+        receiverInput.disabled = false
+        messages.innerHTML = ""
+    })
 </script>
 </body>
 
