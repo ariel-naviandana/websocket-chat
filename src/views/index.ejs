@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,16 +17,19 @@
             max-width: 60%;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
+
         .message.right {
             text-align: right;
             background-color: #d1e7dd;
             margin-left: auto;
         }
+
         .message.left {
             text-align: left;
             background-color: #f8d7da;
             margin-right: auto;
         }
+
         .sender-id {
             font-weight: bold;
             font-size: 14px;
@@ -33,20 +37,24 @@
             top: 5px;
             left: 10px;
         }
+
         .message-time {
             font-size: 12px;
             text-align: right;
             margin-top: 5px;
             color: #888;
         }
+
         .message img {
             display: block;
             margin: 20px 0;
             max-width: 100%;
         }
+
         .message-text {
             margin-top: 10px;
         }
+
         .date-float {
             position: fixed;
             top: 10px;
@@ -58,6 +66,7 @@
             border-radius: 20px;
             display: none;
         }
+
         .status {
             font-size: 12px;
             text-align: right;
@@ -66,13 +75,14 @@
         }
     </style>
 </head>
+
 <body>
 <div class="container mt-4">
     <h1><%= title %></h1>
     <div id="joinContainer">
         <form id="loginForm">
             <input type="text" class="form-control mb-2" id="userId" placeholder="Enter your userId" required>
-            <input type="submit" class="btn btn-success w-100" id="loginButton" value="Join Chat"/>
+            <input type="submit" class="btn btn-success w-100" id="loginButton" value="Join Chat" />
         </form>
     </div>
     <div id="chatContainer" style="display: none;">
@@ -82,7 +92,7 @@
         <form id="chatForm" enctype="multipart/form-data">
             <input type="text" class="form-control mb-2" id="message" placeholder="Type a message">
             <input type="file" class="form-control mb-2" id="image" accept="image/*">
-            <input type="submit" class="btn btn-success w-100" value="Send" id="send"/>
+            <input type="submit" class="btn btn-success w-100" value="Send" id="send" />
         </form>
     </div>
 </div>
@@ -217,10 +227,12 @@
         timeElement.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         messageElement.appendChild(timeElement)
 
-        const statusElement = document.createElement('div')
-        statusElement.classList.add('status')
-        statusElement.textContent = message.status
-        messageElement.appendChild(statusElement)
+        if (message.senderId === userId) {
+            const statusElement = document.createElement('div')
+            statusElement.classList.add('status')
+            statusElement.textContent = message.status
+            messageElement.appendChild(statusElement)
+        }
 
         messages.appendChild(messageElement)
         messages.scrollTop = messages.scrollHeight
@@ -234,9 +246,12 @@
             if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
                 const messageId = messageElement.id.split('-')[1]
                 if (!readMessages.has(messageId)) {
-                    console.log(`Emitting messageRead with messageId: ${messageId}`)
-                    socket.emit("messageRead", { messageId: parseInt(messageId) })
-                    readMessages.add(messageId)
+                    const messageSenderId = messageElement.querySelector('.sender-id').textContent
+                    if (messageSenderId !== userId) {
+                        console.log(`Emitting messageRead with messageId: ${messageId}`)
+                        socket.emit("messageRead", { messageId: parseInt(messageId), userId: userId })
+                        readMessages.add(messageId)
+                    }
                 }
             }
         }
@@ -245,4 +260,5 @@
     messages.addEventListener('scroll', handleScroll)
 </script>
 </body>
+
 </html>

@@ -23,15 +23,6 @@ class BotHandler {
                 }
             })
 
-            socket.on('messageDelivered', async (data: { messageId: number }) => {
-                try {
-                    await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'diterima' })
-                    socket.emit('statusUpdated', { messageId: data.messageId, status: 'diterima' })
-                } catch (error) {
-                    console.error('Error updating message status:', error)
-                }
-            })
-
             socket.on('messageRead', async (data: { messageId: number }) => {
                 try {
                     await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'dibaca' })
