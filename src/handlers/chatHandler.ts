@@ -43,7 +43,7 @@ class ChatHandler {
 
                     this.io.emit('message', data)
 
-                    if (data.text) {
+                    if (data.text && data.receiverId === 'bot') {
                         const response = await axios.post('http://localhost:8000/bot', { text: data.text })
                         const botMessage = response.data
 
