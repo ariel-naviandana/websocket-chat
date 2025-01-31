@@ -5,9 +5,9 @@
   "scripts": {
     "build": "tsc && copyfiles -u 1 src/views/**/* dist/src && copyfiles -u 1 config/**/* dist/config",
     "start": "node dist/src/index.js",
-    "migrate": "npx sequelize-cli db:migrate",
-    "drop": "npx sequelize-cli db:drop",
-    "seed": "npx sequelize-cli db:seed:all"
+    "migrate": "tsc && npx sequelize-cli db:migrate",
+    "drop": "tsc && npx sequelize-cli db:drop",
+    "seed": "tsc && cross-env NODE_OPTIONS=\"--require ts-node/register --require tsconfig-paths/register\" npx sequelize-cli db:seed:all"
   },
   "dependencies": {
     "awilix": "^12.0.4",
@@ -32,14 +32,18 @@
     "@types/sequelize": "^4.28.20",
     "@types/winston": "^2.4.4",
     "copyfiles": "^2.4.1",
+    "cross-env": "^7.0.3",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
   },
   "sequelize": {
-    "config": "config/config.json",
+    "config": "dist/config/config.json",
     "options": {
-      "require": "ts-node/register"
+      "require": [
+        "ts-node/register"
+      ]
     }
   }
 }
