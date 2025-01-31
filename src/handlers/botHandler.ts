@@ -14,7 +14,7 @@ class BotHandler {
 
     private initializeSocketEvents(): void {
         this.io.on('connection', (socket: Socket) => {
-            socket.on('message', async (data: { text: string, senderId: string, imageUrl?: string, createdAt?: Date }) => {
+            socket.on('message', async (data: { text: string, senderId: string, receiverId: string, imageUrl?: string, createdAt?: Date }) => {
                 try {
                     const response = await this.botService.processMessage(data)
                     socket.emit('botResponse', response)

@@ -13,6 +13,10 @@ export default {
         type: Sequelize.STRING,
         allowNull: false
       },
+      receiverId: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       text: {
         type: Sequelize.STRING,
         allowNull: true

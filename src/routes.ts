@@ -41,14 +41,14 @@ export default (app: ExpressApp, container: any, io: Server): void => {
 
     app.post('/sendMessage', upload.single('image'), async (req: Request, res: Response) => {
         try {
-            const { senderId, text } = req.body
+            const { senderId, receiverId, text } = req.body
             let imageUrl: string | undefined = undefined
 
             if (req.file) {
                 imageUrl = `/uploads/${req.file.filename}`
             }
 
-            const messageData = { senderId, text, imageUrl, createdAt: new Date(), status: 'terkirim' }
+            const messageData = { senderId, receiverId, text, imageUrl, createdAt: new Date(), status: 'terkirim' }
             console.log('Saving message to database:', messageData)
             await chatService.saveMessage(messageData)
             res.json(messageData)

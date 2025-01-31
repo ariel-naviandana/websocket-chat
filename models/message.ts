@@ -4,6 +4,7 @@ interface MessageAttributes {
     id: number
     text?: string
     senderId: string
+    receiverId: string
     imageUrl?: string
     createdAt: Date
     updatedAt: Date
@@ -16,6 +17,7 @@ class Message extends Model<MessageAttributes, MessageCreationAttributes> implem
     public id!: number
     public text?: string
     public senderId!: string
+    public receiverId!: string
     public imageUrl?: string
     public createdAt!: Date
     public updatedAt!: Date
@@ -35,6 +37,10 @@ export function initMessageModel(sequelize: Sequelize): typeof Message {
                 allowNull: true,
             },
             senderId: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            receiverId: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },

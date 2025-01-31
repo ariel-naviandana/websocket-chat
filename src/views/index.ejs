@@ -73,6 +73,24 @@
             margin-top: 5px;
             color: #888;
         }
+
+        .conversation-list {
+            margin-bottom: 20px;
+        }
+
+        .conversation-item {
+            cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .conversation-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .active-conversation {
+            background-color: #d1e7dd;
+        }
     </style>
 </head>
 
@@ -86,10 +104,12 @@
         </form>
     </div>
     <div id="chatContainer" style="display: none;">
+        <div class="conversation-list" id="conversationList"></div>
         <div class="date-float" id="dateFloat"></div>
         <div id="messages" class="border p-4 mb-3" style="height: 300px; overflow-y: scroll;"></div>
         <div id="typing" class="text-muted mb-2" style="display: none;"></div>
         <form id="chatForm" enctype="multipart/form-data">
+            <input type="text" class="form-control mb-2" id="receiverId" placeholder="Enter receiver's userId" required>
             <input type="text" class="form-control mb-2" id="message" placeholder="Type a message">
             <input type="file" class="form-control mb-2" id="image" accept="image/*">
             <input type="submit" class="btn btn-success w-100" value="Send" id="send" />
@@ -103,13 +123,16 @@
     const chatContainer = document.getElementById("chatContainer")
     const messages = document.getElementById("messages")
     const messageInput = document.getElementById("message")
+    const receiverInput = document.getElementById("receiverId")
     const imageInput = document.getElementById("image")
     const typingIndicator = document.getElementById("typing")
     const dateFloat = document.getElementById("dateFloat")
+    const conversationList = document.getElementById("conversationList")
     let userId = null
     let isTyping = false
     let typingTimeout
     let readMessages = new Set()
+    let activeConversation = null
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
         e.preventDefault()
@@ -121,7 +144,10 @@
         const response = await fetch('/messages')
         const messageHistory = await response.json()
         messageHistory.forEach(msg => {
-            addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
+            if (msg.senderId === userId || msg.receiverId === userId) {
+                addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
+                addConversation(msg.senderId === userId ? msg.receiverId : msg.senderId)
+            }
         })
         handleScroll()
     })
@@ -146,11 +172,13 @@
     document.getElementById("chatForm").addEventListener("submit", (e) => {
         e.preventDefault()
         const messageText = messageInput.value
+        const receiverId = receiverInput.value
         const imageFile = imageInput.files[0]
 
         if (messageText || imageFile) {
             const data = new FormData()
             data.append('senderId', userId)
+            data.append('receiverId', receiverId)
             data.append('text', messageText)
             if (imageFile) {
                 data.append('image', imageFile)
@@ -174,18 +202,22 @@
     })
 
     socket.on("typing", (data) => {
-        typingIndicator.textContent = `${data.senderId} is typing...`
-        typingIndicator.style.display = "block"
+        if (data.senderId === activeConversation) {
+            typingIndicator.textContent = `${data.senderId} is typing...`
+            typingIndicator.style.display = "block"
+        }
     })
 
-    socket.on("stopTyping", () => {
-        typingIndicator.textContent = ""
-        typingIndicator.style.display = "none"
+    socket.on("stopTyping", (data) => {
+        if (data.senderId === activeConversation) {
+            typingIndicator.textContent = ""
+            typingIndicator.style.display = "none"
+        }
     })
 
     socket.on("message", (data) => {
-        if (data.senderId !== userId) {
-            addMessageToChat(data, "left")
+        if (data.senderId === activeConversation || data.receiverId === activeConversation) {
+            addMessageToChat(data, data.senderId === userId ? 'right' : 'left')
         }
         handleScroll()
     })
@@ -236,6 +268,42 @@
 
         messages.appendChild(messageElement)
         messages.scrollTop = messages.scrollHeight
+    }
+
+    function addConversation(conversationId) {
+        if (!document.getElementById(`conversation-${conversationId}`)) {
+            const conversationItem = document.createElement('div')
+            conversationItem.classList.add('conversation-item')
+            conversationItem.id = `conversation-${conversationId}`
+            conversationItem.textContent = conversationId
+            conversationItem.addEventListener('click', () => {
+                setActiveConversation(conversationId)
+            })
+            conversationList.appendChild(conversationItem)
+        }
+    }
+
+    function setActiveConversation(conversationId) {
+        if (activeConversation) {
+            document.getElementById(`conversation-${activeConversation}`).classList.remove('active-conversation')
+        }
+        activeConversation = conversationId
+        document.getElementById(`conversation-${conversationId}`).classList.add('active-conversation')
+        receiverInput.value = conversationId
+        loadConversation(conversationId)
+    }
+
+    function loadConversation(conversationId) {
+        messages.innerHTML = ""
+        const response = fetch('/messages').then(res => res.json()).then(messageHistory => {
+            messageHistory.forEach(msg => {
+                if ((msg.senderId === userId && msg.receiverId === conversationId) ||
+                    (msg.senderId === conversationId && msg.receiverId === userId)) {
+                    addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
+                }
+            })
+            handleScroll()
+        })
     }
 
     function handleScroll() {

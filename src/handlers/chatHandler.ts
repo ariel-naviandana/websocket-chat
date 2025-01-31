@@ -48,7 +48,13 @@ class ChatHandler {
                         const botMessage = response.data
 
                         if (botMessage) {
-                            const botData: MessageData = { text: botMessage, senderId: 'bot', createdAt: new Date(), status: 'terkirim' }
+                            const botData: MessageData = {
+                                text: botMessage,
+                                senderId: 'bot',
+                                receiverId: data.senderId,
+                                createdAt: new Date(),
+                                status: 'terkirim'
+                            }
                             this.io.emit('message', botData)
                             await this.chatService.saveMessage(botData)
                         }
@@ -84,7 +90,7 @@ class ChatHandler {
     public setupRoutes(app: Application): void {
         app.post('/sendMessage', upload.single('image'), async (req: Request, res: Response) => {
             try {
-                const { senderId, text } = req.body
+                const { senderId, text, receiverId } = req.body
                 let imageUrl: string | undefined = undefined
 
                 if (req.file) {
@@ -93,6 +99,7 @@ class ChatHandler {
 
                 const messageData: MessageData = {
                     senderId,
+                    receiverId,
                     text,
                     imageUrl,
                     createdAt: new Date(),

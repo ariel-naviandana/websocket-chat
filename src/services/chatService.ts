@@ -12,6 +12,9 @@ class ChatService implements IChatService {
         if (!data.senderId) {
             throw new Error('senderId is required')
         }
+        if (!data.receiverId) {
+            throw new Error('receiverId is required')
+        }
         return this.messageRepository.saveMessage({
             ...data,
             status: data.status ?? 'terkirim'

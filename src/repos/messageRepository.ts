@@ -10,9 +10,13 @@ class MessageRepository implements IMessageRepository {
             if (!data.senderId) {
                 throw new Error('senderId is required')
             }
+            if (!data.receiverId) {
+                throw new Error('receiverId is required')
+            }
             const message = await Message.create({
                 text: data.text,
                 senderId: data.senderId,
+                receiverId: data.receiverId,
                 imageUrl: data.imageUrl,
                 createdAt: data.createdAt ?? new Date(),
                 updatedAt: new Date(),

@@ -1,10 +1,11 @@
 import { IBotService } from './IBotService'
 import { IMessageRepository } from '../repos/IMessageRepository'
-import {Message, MessageData} from "./IChatService"
+import { Message, MessageData } from "./IChatService"
 
 interface IMessage {
     text: string
     senderId: string
+    receiverId: string
     imageUrl?: string
     createdAt?: Date
     status?: string
@@ -38,6 +39,9 @@ class BotService implements IBotService {
     async saveMessage(data: MessageData): Promise<Message> {
         if (!data.senderId) {
             throw new Error('senderId is required')
+        }
+        if (!data.receiverId) {
+            throw new Error('receiverId is required')
         }
         return this.messageRepository.saveMessage({
             ...data,

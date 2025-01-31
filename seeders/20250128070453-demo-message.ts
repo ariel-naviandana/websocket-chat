@@ -2,9 +2,10 @@ import { QueryInterface } from 'sequelize'
 
 module.exports = {
   up: async (queryInterface: QueryInterface) => {
-    return queryInterface.bulkInsert('messages', [
+    return queryInterface.bulkInsert('Messages', [
       {
         senderId: 'user1',
+        receiverId: 'user2',
         text: 'Hello, this is a test message.',
         imageUrl: null,
         createdAt: new Date(),
@@ -13,6 +14,7 @@ module.exports = {
       },
       {
         senderId: 'user2',
+        receiverId: 'user3',
         text: 'Hi, this is another test message.',
         imageUrl: null,
         createdAt: new Date(),
@@ -21,6 +23,7 @@ module.exports = {
       },
       {
         senderId: 'user3',
+        receiverId: 'user4',
         text: 'Hello everyone!',
         imageUrl: null,
         createdAt: new Date(),
@@ -29,6 +32,7 @@ module.exports = {
       },
       {
         senderId: 'user4',
+        receiverId: 'user1',
         text: 'Good morning!',
         imageUrl: null,
         createdAt: new Date(),
@@ -39,6 +43,6 @@ module.exports = {
   },
 
   down: async (queryInterface: QueryInterface) => {
-    return queryInterface.bulkDelete('messages', {}, {})
+    return queryInterface.bulkDelete('Messages', {}, {})
   }
 }

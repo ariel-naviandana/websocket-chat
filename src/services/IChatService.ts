@@ -7,6 +7,7 @@ export interface IChatService {
 export interface MessageData {
     text: string
     senderId: string
+    receiverId: string
     imageUrl?: string
     createdAt: Date
     status?: string
@@ -16,6 +17,7 @@ export interface Message {
     id: number
     text: string
     senderId: string
+    receiverId: string
     imageUrl?: string
     createdAt: Date
     updatedAt: Date
