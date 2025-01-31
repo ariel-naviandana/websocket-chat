@@ -1,5 +1,8 @@
-import db from '../../models'
-import { IMessageRepository, MessageData, Message } from './IMessageRepository'
+import initMessageModel from '../../models/message'
+import { IMessageRepository, MessageData, Message as MessageType } from './IMessageRepository'
+import { sequelize } from '../../models'
+
+const Message = initMessageModel(sequelize)
 
 class MessageRepository implements IMessageRepository {
     async saveMessage(data: MessageData): Promise<void> {
@@ -7,12 +10,13 @@ class MessageRepository implements IMessageRepository {
             if (!data.senderId) {
                 throw new Error('senderId is required')
             }
-            await db.Message.create({
+            await Message.create({
                 text: data.text,
                 senderId: data.senderId,
                 imageUrl: data.imageUrl,
                 createdAt: data.createdAt ?? new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                status: data.status ?? 'terkirim'
             })
         } catch (error) {
             console.error('Error saving message:', error)
@@ -20,14 +24,28 @@ class MessageRepository implements IMessageRepository {
         }
     }
 
-    async getMessages(): Promise<Message[]> {
+    async getMessages(): Promise<MessageType[]> {
         try {
-            const messages = await db.Message.findAll({
+            const messages = await Message.findAll({
                 order: [['createdAt', 'ASC']]
             })
-            return messages as any as Message[]
+            return messages as any as MessageType[]
         } catch (error) {
             console.error('Error fetching messages:', error)
+            throw error
+        }
+    }
+
+    async updateMessageStatus(id: number, status: string): Promise<void> {
+        try {
+            const message = await Message.findByPk(id)
+            if (!message) {
+                throw new Error('Message not found')
+            }
+            message.status = status
+            await message.save()
+        } catch (error) {
+            console.error('Error updating message status:', error)
             throw error
         }
     }

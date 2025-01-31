@@ -12,11 +12,18 @@ class ChatService implements IChatService {
         if (!data.senderId) {
             throw new Error('senderId is required')
         }
-        return this.messageRepository.saveMessage(data)
+        return this.messageRepository.saveMessage({
+            ...data,
+            status: data.status ?? 'terkirim'
+        })
     }
 
     async getMessages(): Promise<Message[]> {
         return this.messageRepository.getMessages()
+    }
+
+    async updateMessageStatus(id: number, status: string): Promise<void> {
+        return this.messageRepository.updateMessageStatus(id, status)
     }
 }
 

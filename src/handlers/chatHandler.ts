@@ -1,7 +1,7 @@
 import axios from 'axios'
 import multer, { StorageEngine } from 'multer'
 import path from 'path'
-import express, {Application, Request, Response} from 'express'
+import express, { Application, Request, Response } from 'express'
 import fs from 'fs'
 import { Server, Socket } from 'socket.io'
 import { IChatService, MessageData } from '../services/IChatService'
@@ -39,6 +39,7 @@ class ChatHandler {
                 try {
                     data.senderId = data.senderId || socket.id
                     data.createdAt = data.createdAt ?? new Date()
+                    data.status = 'terkirim'
 
                     this.io.emit('message', data)
 
@@ -47,13 +48,31 @@ class ChatHandler {
                         const botMessage = response.data
 
                         if (botMessage) {
-                            const botData: MessageData = { text: botMessage, senderId: 'bot', createdAt: new Date() }
+                            const botData: MessageData = { text: botMessage, senderId: 'bot', createdAt: new Date(), status: 'terkirim' }
                             this.io.emit('message', botData)
                             await this.chatService.saveMessage(botData)
                         }
                     }
                 } catch (error) {
                     console.error('Error processing message:', error)
+                }
+            })
+
+            socket.on('messageDelivered', async (data: { messageId: number }) => {
+                try {
+                    await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'diterima' })
+                    socket.emit('statusUpdated', { messageId: data.messageId, status: 'diterima' })
+                } catch (error) {
+                    console.error('Error updating message status:', error)
+                }
+            })
+
+            socket.on('messageRead', async (data: { messageId: number }) => {
+                try {
+                    await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'dibaca' })
+                    socket.emit('statusUpdated', { messageId: data.messageId, status: 'dibaca' })
+                } catch (error) {
+                    console.error('Error updating message status:', error)
                 }
             })
 
@@ -85,7 +104,8 @@ class ChatHandler {
                     senderId,
                     text,
                     imageUrl,
-                    createdAt: new Date()
+                    createdAt: new Date(),
+                    status: 'terkirim'
                 }
                 console.log('Saving message to database:', messageData)
                 await this.chatService.saveMessage(messageData)

@@ -58,6 +58,12 @@
             border-radius: 20px;
             display: none;
         }
+        .status {
+            font-size: 12px;
+            text-align: right;
+            margin-top: 5px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -171,9 +177,18 @@
         }
     })
 
+    socket.on("statusUpdated", (data) => {
+        const messageElement = document.getElementById(`message-${data.messageId}`)
+        if (messageElement) {
+            const statusElement = messageElement.querySelector('.status')
+            statusElement.textContent = data.status
+        }
+    })
+
     function addMessageToChat(message, align) {
         const messageElement = document.createElement('div')
         messageElement.classList.add('message', align)
+        messageElement.id = `message-${message.id}`
 
         const senderIdElement = document.createElement('div')
         senderIdElement.classList.add('sender-id')
@@ -198,6 +213,11 @@
         const timestamp = new Date(message.createdAt)
         timeElement.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         messageElement.appendChild(timeElement)
+
+        const statusElement = document.createElement('div')
+        statusElement.classList.add('status')
+        statusElement.textContent = message.status
+        messageElement.appendChild(statusElement)
 
         messages.appendChild(messageElement)
         messages.scrollTop = messages.scrollHeight

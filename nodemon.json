@@ -1,0 +1,5 @@
+{
+  "watch": ["src", "helpers", "config", "models", "migrations", "seeders"],
+  "ext": "ts",
+  "exec": "ts-node ./src/index.ts"
+}

@@ -30,6 +30,11 @@ export default {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+      },
+      status: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'terkirim'
       }
     })
   },

@@ -3,8 +3,7 @@ import { Application as ExpressApp } from 'express-serve-static-core'
 import multer, { StorageEngine } from 'multer'
 import path from 'path'
 import { Server } from 'socket.io'
-import {ChatHandler} from './handlers/chatHandler'
-// import {BotHandler} from './handlers/botHandler'
+import { ChatHandler } from './handlers/chatHandler'
 import { IChatService } from './services/IChatService'
 import { IBotService } from './services/IBotService'
 
@@ -14,7 +13,6 @@ export default (app: ExpressApp, container: any, io: Server): void => {
     chatHandler.setupRoutes(app)
 
     const botService: IBotService = container.resolve('botService')
-    // const botHandler = new BotHandler(io, botService)
 
     const storage: StorageEngine = multer.diskStorage({
         destination: (req, file, cb) => {
@@ -50,13 +48,24 @@ export default (app: ExpressApp, container: any, io: Server): void => {
                 imageUrl = `/uploads/${req.file.filename}`
             }
 
-            const messageData = { senderId, text, imageUrl, createdAt: new Date() }
+            const messageData = { senderId, text, imageUrl, createdAt: new Date(), status: 'terkirim' }
             console.log('Saving message to database:', messageData)
             await chatService.saveMessage(messageData)
             res.json(messageData)
         } catch (error) {
             console.error('Error sending message:', error)
             res.status(500).json({ error: 'Failed to send message' })
+        }
+    })
+
+    app.put('/updateMessageStatus', async (req: Request, res: Response) => {
+        try {
+            const { messageId, status } = req.body
+            await chatService.updateMessageStatus(messageId, status)
+            res.json({ messageId, status })
+        } catch (error) {
+            console.error('Error updating message status:', error)
+            res.status(500).json({ error: 'Failed to update message status' })
         }
     })
 

@@ -1,6 +1,7 @@
 export interface IChatService {
     saveMessage(data: MessageData): Promise<void>
     getMessages(): Promise<Message[]>
+    updateMessageStatus(id: number, status: string): Promise<void>
 }
 
 export interface MessageData {
@@ -8,6 +9,7 @@ export interface MessageData {
     senderId: string
     imageUrl?: string
     createdAt: Date
+    status?: string
 }
 
 export interface Message {
@@ -17,4 +19,5 @@ export interface Message {
     imageUrl?: string
     createdAt: Date
     updatedAt: Date
+    status?: string
 }
