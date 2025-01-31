@@ -61,7 +61,7 @@ class ChatHandler {
             socket.on('messageDelivered', async (data: { messageId: number }) => {
                 try {
                     await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'diterima' })
-                    socket.emit('statusUpdated', { messageId: data.messageId, status: 'diterima' })
+                    this.io.emit('statusUpdated', { messageId: data.messageId, status: 'diterima' })
                 } catch (error) {
                     console.error('Error updating message status:', error)
                 }
@@ -70,7 +70,7 @@ class ChatHandler {
             socket.on('messageRead', async (data: { messageId: number }) => {
                 try {
                     await axios.put('http://localhost:8000/updateMessageStatus', { messageId: data.messageId, status: 'dibaca' })
-                    socket.emit('statusUpdated', { messageId: data.messageId, status: 'dibaca' })
+                    this.io.emit('statusUpdated', { messageId: data.messageId, status: 'dibaca' })
                 } catch (error) {
                     console.error('Error updating message status:', error)
                 }
@@ -108,8 +108,8 @@ class ChatHandler {
                     status: 'terkirim'
                 }
                 console.log('Saving message to database:', messageData)
-                await this.chatService.saveMessage(messageData)
-                res.json(messageData)
+                const responseData = await this.chatService.saveMessage(messageData)
+                res.json(responseData)
             } catch (error) {
                 console.error('Error sending message:', error)
                 res.status(500).json({ error: 'Failed to send message' })

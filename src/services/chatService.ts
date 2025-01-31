@@ -8,7 +8,7 @@ class ChatService implements IChatService {
         this.messageRepository = messageRepository
     }
 
-    async saveMessage(data: MessageData): Promise<void> {
+    async saveMessage(data: MessageData): Promise<Message> {
         if (!data.senderId) {
             throw new Error('senderId is required')
         }
@@ -22,7 +22,7 @@ class ChatService implements IChatService {
         return this.messageRepository.getMessages()
     }
 
-    async updateMessageStatus(id: number, status: string): Promise<void> {
+    async updateMessageStatus(id: number, status: string): Promise<Message> {
         return this.messageRepository.updateMessageStatus(id, status)
     }
 }

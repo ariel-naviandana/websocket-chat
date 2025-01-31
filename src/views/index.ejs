@@ -99,6 +99,7 @@
     let userId = null
     let isTyping = false
     let typingTimeout
+    let readMessages = new Set()
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
         e.preventDefault()
@@ -112,6 +113,7 @@
         messageHistory.forEach(msg => {
             addMessageToChat(msg, msg.senderId === userId ? 'right' : 'left')
         })
+        handleScroll()
     })
 
     messageInput.addEventListener("input", () => {
@@ -175,6 +177,7 @@
         if (data.senderId !== userId) {
             addMessageToChat(data, "left")
         }
+        handleScroll()
     })
 
     socket.on("statusUpdated", (data) => {
@@ -223,22 +226,23 @@
         messages.scrollTop = messages.scrollHeight
     }
 
-    messages.addEventListener('scroll', () => {
+    function handleScroll() {
         const messagesArray = Array.from(messages.children)
         for (let i = 0; i < messagesArray.length; i++) {
             const messageElement = messagesArray[i]
             const rect = messageElement.getBoundingClientRect()
             if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-                const messageTime = messageElement.querySelector('.message-time')
-                const date = new Date(messageTime.textContent)
-                if (!isNaN(date)) {
-                    dateFloat.textContent = date.toLocaleDateString()
-                    dateFloat.style.display = 'block'
+                const messageId = messageElement.id.split('-')[1]
+                if (!readMessages.has(messageId)) {
+                    console.log(`Emitting messageRead with messageId: ${messageId}`)
+                    socket.emit("messageRead", { messageId: parseInt(messageId) })
+                    readMessages.add(messageId)
                 }
-                break
             }
         }
-    })
+    }
+
+    messages.addEventListener('scroll', handleScroll)
 </script>
 </body>
 </html>

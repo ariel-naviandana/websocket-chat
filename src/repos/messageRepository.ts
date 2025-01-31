@@ -5,12 +5,12 @@ import { sequelize } from '../../models'
 const Message = initMessageModel(sequelize)
 
 class MessageRepository implements IMessageRepository {
-    async saveMessage(data: MessageData): Promise<void> {
+    async saveMessage(data: MessageData): Promise<MessageType> {
         try {
             if (!data.senderId) {
                 throw new Error('senderId is required')
             }
-            await Message.create({
+            const message = await Message.create({
                 text: data.text,
                 senderId: data.senderId,
                 imageUrl: data.imageUrl,
@@ -18,6 +18,7 @@ class MessageRepository implements IMessageRepository {
                 updatedAt: new Date(),
                 status: data.status ?? 'terkirim'
             })
+            return message as any as MessageType
         } catch (error) {
             console.error('Error saving message:', error)
             throw error
@@ -36,14 +37,15 @@ class MessageRepository implements IMessageRepository {
         }
     }
 
-    async updateMessageStatus(id: number, status: string): Promise<void> {
+    async updateMessageStatus(id: number, status: string): Promise<MessageType> {
         try {
             const message = await Message.findByPk(id)
             if (!message) {
                 throw new Error('Message not found')
             }
             message.status = status
-            await message.save()
+            const messageSaved = await message.save()
+            return messageSaved as any as MessageType
         } catch (error) {
             console.error('Error updating message status:', error)
             throw error

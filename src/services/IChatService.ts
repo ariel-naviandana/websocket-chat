@@ -1,7 +1,7 @@
 export interface IChatService {
-    saveMessage(data: MessageData): Promise<void>
+    saveMessage(data: MessageData): Promise<Message>
     getMessages(): Promise<Message[]>
-    updateMessageStatus(id: number, status: string): Promise<void>
+    updateMessageStatus(id: number, status: string): Promise<Message>
 }
 
 export interface MessageData {
