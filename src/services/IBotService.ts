@@ -1,3 +1,3 @@
 export interface IBotService {
-    processMessage(message: { text: string }): Promise<string | null>;
+    processMessage(message: { text: string }): Promise<string | null>
 }

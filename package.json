@@ -31,9 +31,15 @@
     "@types/node": "^22.12.0",
     "@types/sequelize": "^4.28.20",
     "@types/winston": "^2.4.4",
+    "copyfiles": "^2.4.1",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "copyfiles": "^2.4.1"
+    "typescript": "^5.7.3"
+  },
+  "sequelize": {
+    "config": "config/config.json",
+    "options": {
+      "require": "ts-node/register"
+    }
   }
 }

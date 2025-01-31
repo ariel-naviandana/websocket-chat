@@ -1,4 +1,4 @@
-import { QueryInterface } from 'sequelize';
+import { QueryInterface } from 'sequelize'
 
 module.exports = {
   up: async (queryInterface: QueryInterface) => {
@@ -31,11 +31,10 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-    ]);
+    ])
   },
 
   down: async (queryInterface: QueryInterface) => {
-    // Gunakan kondisi yang benar untuk menghapus semua entri
-    return queryInterface.bulkDelete('messages', {}, {});
+    return queryInterface.bulkDelete('messages', {}, {})
   }
-};
+}

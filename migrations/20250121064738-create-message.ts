@@ -1,4 +1,4 @@
-import { QueryInterface, DataTypes } from 'sequelize';
+import { QueryInterface, DataTypes } from 'sequelize'
 
 export default {
   up: async (queryInterface: QueryInterface, Sequelize: typeof DataTypes) => {
@@ -31,9 +31,9 @@ export default {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       }
-    });
+    })
   },
-  down: async (queryInterface: QueryInterface, Sequelize: typeof DataTypes) => {
-    await queryInterface.dropTable('Messages');
+  down: async (queryInterface: QueryInterface) => {
+    await queryInterface.dropTable('Messages')
   }
-};
+}

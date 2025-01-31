@@ -1,30 +1,30 @@
-import { IBotService } from './IBotService';
-import { IMessageRepository } from '../repos/IMessageRepository';  // Pastikan untuk menyesuaikan path impor sesuai dengan struktur proyek Anda
+import { IBotService } from './IBotService'
+import { IMessageRepository } from '../repos/IMessageRepository'
 
 interface IMessage {
-    text: string;
+    text: string
 }
 
 class BotService implements IBotService {
-    private messageRepository: IMessageRepository;
+    private messageRepository: IMessageRepository
 
     constructor({ messageRepository }: { messageRepository: IMessageRepository }) {
-        this.messageRepository = messageRepository;
+        this.messageRepository = messageRepository
     }
 
     async processMessage(message: IMessage): Promise<string | null> {
-        const keywords = ['help', 'info'];
-        let response: string | null = null;
+        const keywords = ['help', 'info']
+        let response: string | null = null
 
         for (const keyword of keywords) {
             if (message.text.toLowerCase().includes(keyword)) {
-                response = `Bot received the keyword: ${keyword}`;
-                break;
+                response = `Bot received the keyword: ${keyword}`
+                break
             }
         }
 
-        return response;
+        return response
     }
 }
 
-export default BotService;
+export default BotService

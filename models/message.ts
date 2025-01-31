@@ -1,28 +1,25 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize'
 
-// Definisikan antarmuka untuk atribut Model
 interface MessageAttributes {
-  id: number;
-  text?: string;
-  senderId: string;
-  imageUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  id: number
+  text?: string
+  senderId: string
+  imageUrl?: string
+  createdAt: Date
+  updatedAt: Date
 }
 
-// Definisikan antarmuka untuk atribut yang dapat diisi
 interface MessageCreationAttributes extends Optional<MessageAttributes, 'id' | 'text' | 'imageUrl'> {}
 
-// Buat model dengan Sequelize
 module.exports = (sequelize: Sequelize) => {
   class Message extends Model<MessageAttributes, MessageCreationAttributes>
       implements MessageAttributes {
-    public id!: number;
-    public text?: string;
-    public senderId!: string;
-    public imageUrl?: string;
-    public createdAt!: Date;
-    public updatedAt!: Date;
+    public id!: number
+    public text?: string
+    public senderId!: string
+    public imageUrl?: string
+    public createdAt!: Date
+    public updatedAt!: Date
   }
 
   Message.init(
@@ -61,7 +58,7 @@ module.exports = (sequelize: Sequelize) => {
         tableName: 'Messages',
         timestamps: true,
       }
-  );
+  )
 
-  return Message;
-};
+  return Message
+}
